@@ -1,0 +1,111 @@
+/* App.css */
+
+/* Sets the body and root container to a dark, professional background color */
+body, #root, .App {
+    background-color: #0b0f19;
+    color: #f8f9fa; /* Light text color for contrast */
+    min-height: 100vh; /* Ensures the background covers the whole page */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+}
+
+/* Custom card styles for the dashboard */
+.card {
+    background-color: #212529 !important; /* A slightly lighter dark background for cards */
+    color: #f8f9fa !important;
+    border: none !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Enhancing the form and input fields */
+.form-control, .input-group-text, .form-select {
+    background-color: #343a40 !important;
+    color: #f8f9fa !important;
+    border: 1px solid #495057 !important;
+    border-radius: 8px !important;
+}
+
+.form-control::placeholder {
+    color: #adb5bd;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #343a40;
+    color: #f8f9fa;
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Styling for buttons to make them pop */
+.btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0a58ca !important;
+}
+
+.btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    transition: background-color 0.2s ease;
+}
+
+.btn-danger:hover {
+    background-color: #b02a37 !important;
+}
+
+.btn-info {
+    background-color: #0dcaf0 !important;
+    border-color: #0dcaf0 !important;
+    color: #212529 !important;
+    transition: background-color 0.2s ease;
+}
+
+.btn-info:hover {
+    background-color: #0aa2c0 !important;
+}
+
+.btn-success {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    transition: background-color 0.2s ease;
+}
+
+.btn-success:hover {
+    background-color: #157347 !important;
+}
+
+.btn-warning {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #212529 !important;
+    transition: background-color 0.2s ease;
+}
+
+.btn-warning:hover {
+    background-color: #ffcd39 !important;
+}
+
+/* List group item styling for better visual separation */
+.list-group-item {
+    background-color: #212529 !important;
+    border: 1px solid #495057 !important;
+    border-radius: 8px !important;
+}
+
+/* NEW: Styles for the chart's container to give it a fixed height */
+.chart-container {
+    position: relative;
+    max-height: 400px; /* Adjust this value as needed */
+}
