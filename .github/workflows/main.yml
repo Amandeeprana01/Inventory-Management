@@ -7,6 +7,7 @@ on:
 
 env:
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
   FRONTEND_IMAGE: amandeeprana/inventoryproject_frontend
   BACKEND_IMAGE: amandeeprana/inventoryproject_backend
   KUBE_DEPLOYMENT_NAMESPACE: default
@@ -24,7 +25,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: ${{ env.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       # ----------------------------------------------
       # Build + Push Backend Image
