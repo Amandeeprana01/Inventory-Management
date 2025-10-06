@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: amandeeprana/inventoryproject_backend:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4000 
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+        env:
+          - name: DATABASE_HOST
+            value: mysql-service 
+            
+          # We use the 'root' user as it is the safest choice when pulling the root password
+          - name: DATABASE_USER
+            value: root 
+            
+          # -----------------------------------------------------------------
+          # ✅ CRITICAL FIX: Pulling the password from the Secret. 
+          # This key holds the decoded value 'Aprana@12345!'
+          # -----------------------------------------------------------------
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-root-credentials
+                key: mysql-root-password
+          # -----------------------------------------------------------------
+            
+          # -----------------------------------------------------------------
+          # ✅ FIX: Pulling the database name from the Secret.
+          # This key holds the decoded value 'my_python_app_db'
+          # -----------------------------------------------------------------
+          - name: DATABASE_NAME
+            valueFrom:
+              secretKeyRef:
+                name: mysql-root-credentials
+                key: mysql-database
+          # -----------------------------------------------------------------
+
+          - name: FLASK_APP
+            value: app.py
+          - name: FLASK_RUN_HOST
+            value: 0.0.0.0
+          - name: FLASK_RUN_PORT
+            value: "4000"

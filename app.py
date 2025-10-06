@@ -1,17 +1,28 @@
 from flask import Flask, request, jsonify, abort
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, LoginManager, login_user, login_required, current_user, logout_user
 from sqlalchemy import func
 from functools import wraps
+import os # <-- CRITICAL: Added os module to read environment variables
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'a_very_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://user:password@localhost/my_python_app_db' # Use your MySQL credentials
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = 'a_very_secret_key' # Should be read from env in production
 
-CORS(app, origins="http://localhost:3001", supports_credentials=True)
+# ----------------------------------------------------------------------------------
+# CRITICAL FIX: Dynamically construct SQLALCHEMY_DATABASE_URI from Kubernetes environment variables
+# ----------------------------------------------------------------------------------
+DB_HOST = os.environ.get('DATABASE_HOST', 'localhost')
+DB_USER = os.environ.get('DATABASE_USER', 'user')
+DB_PASS = os.environ.get('DATABASE_PASSWORD', 'password')
+DB_NAME = os.environ.get('DATABASE_NAME', 'my_python_app_db')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# ----------------------------------------------------------------------------------
+
+CORS(app, supports_credentials=True)
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -37,7 +48,6 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
-    # NEW: Add is_admin column
     is_admin = db.Column(db.Boolean, default=False)
 
     def set_password(self, password):
@@ -62,12 +72,12 @@ class Allocation(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     allocation_date = db.Column(db.DateTime, server_default=func.now())
     
-    # Relationships for easy access
     user = db.relationship('User', backref=db.backref('allocations', lazy=True))
     inventory = db.relationship('Inventory', backref=db.backref('allocations', lazy=True))
 
 # NEW: API route to get all non-admin users
 @app.route("/api/users", methods=["GET"])
+@cross_origin(supports_credentials=True) 
 @login_required
 @admin_required
 def get_users():
@@ -91,7 +101,6 @@ def home():
 @app.route("/api/status")
 def status():
     if current_user.is_authenticated:
-        # NEW: Return is_admin status
         return jsonify({"is_logged_in": True, "username": current_user.username, "is_admin": current_user.is_admin})
     else:
         return jsonify({"is_logged_in": False, "username": None, "is_admin": False})
@@ -107,7 +116,6 @@ def register():
             return jsonify({"error": "Username and password are required"}), 400
         if User.query.filter_by(username=username).first():
             return jsonify({"error": "User already exists"}), 409
-        # NEW: Don't set is_admin to True by default
         new_user = User(username=username, is_admin=False)
         new_user.set_password(password)
         db.session.add(new_user)
@@ -124,7 +132,6 @@ def login():
         user = User.query.filter_by(username=data.get("username")).first()
         if user and user.check_password(data.get("password")):
             login_user(user)
-            # NEW: Return is_admin status on login
             return jsonify({"message": "Logged in successfully!", "username": user.username, "is_admin": user.is_admin}), 200
         else:
             return jsonify({"error": "Invalid username or password"}), 401
@@ -337,17 +344,3 @@ def create_allocation():
         db.session.rollback()
         print(f"Error creating allocation: {e}")
         return jsonify({"error": "Failed to create allocation"}), 500
-
-if __name__ == "__main__":
-    with app.app_context():
-        # This will create all the tables if they don't exist
-        db.create_all()
-        # Create a default admin user if one doesn't exist
-        admin_user = User.query.filter_by(username='admin').first()
-        if not admin_user:
-            new_admin = User(username='admin', is_admin=True)
-            new_admin.set_password('admin_password')  # Use a strong password in a real app
-            db.session.add(new_admin)
-            db.session.commit()
-            print("Default admin user created.")
-    app.run(debug=True, port=5000)

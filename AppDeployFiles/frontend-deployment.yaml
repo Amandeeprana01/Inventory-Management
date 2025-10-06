@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  labels:
+    app: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: amandeeprana/inventoryproject_frontend:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80 
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+
+          requests:
+            # *** ADD THIS SECTION AND LOWER THE CPU REQUEST ***
+            memory: "128Mi"
+            cpu: "500m" # Requesting only half a CPU core (500m)

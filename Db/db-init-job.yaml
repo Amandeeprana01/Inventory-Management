@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: backend-db-init-job
+spec:
+  # The job should only run once successfully
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: db-initializer
+        # Use the same backend image you just built and pushed
+        image: amandeeprana/inventoryproject_backend:v1
+        # CRITICAL: Override the CMD to run the setup script instead of flask run
+        command: ["python"]
+        args: ["db_setup.py"]
+        
+        # Inject the same environment variables as your backend deployment
+        # The script needs these to connect to the 'mysql-service'
+        env:
+          - name: DATABASE_HOST
+            value: mysql-service 
+          - name: DATABASE_USER
+            value: new_user
+          - name: DATABASE_PASSWORD
+            value: my_secure_password 
+          - name: DATABASE_NAME
+            valueFrom:
+              secretKeyRef:
+                name: mysql-root-credentials
+                key: mysql-database

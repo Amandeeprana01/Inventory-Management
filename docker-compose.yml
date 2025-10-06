@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    # 1. Build context is the current directory (where Dockerfile is located)
+    build: .
+    # 2. CRITICAL: Image tag for Docker Hub deployment
+    image: amandeeprana/inventoryproject_backend:v1 
+    
+    # Dependencies are maintained to ensure 'db' is ready for 'backend' build/setup
+    depends_on:
+      - db
+      
+    # Environment variables are required for the 'db_setup.py' script to run during the build
+    environment:
+      # These must match the environment variables used in app.py and db_setup.py
+      - DATABASE_HOST=db
+      - DATABASE_USER=root 
+      - DATABASE_PASSWORD=Aprana@12345!
+      - DATABASE_NAME=inventory_db
+      
+      # Flask settings required for the build/setup process
+      - FLASK_APP=app.py
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=5000 
+
+  frontend:
+    # 1. Build context is the './frontend' directory
+    build: ./frontend
+    # 2. CRITICAL: Image tag for Docker Hub deployment
+    image: amandeeprana/inventoryproject_frontend:v1
+
+    # Dependency on backend removed as the frontend only needs Nginx to serve static files (no service dependency)
+
+  db:
+    # Official MySQL image is pulled, not built
+    image: mysql:8.0
+    
+    # Environment variables needed for MySQL container startup
+    environment:
+      - MYSQL_ROOT_PASSWORD=Aprana@12345!
+      - MYSQL_DATABASE=inventory_db
+
+# NOTE: All local ports, container names, and volume mounts are intentionally removed.
+# They are not needed for image creation and would conflict with Kubernetes orchestration.

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service # <-- CRUCIAL: Must be a unique name
+  labels:
+    app: backend
+spec:
+  type: NodePort      # <-- CHANGE: Use NodePort to get an external URL on Minikube
+  ports:
+    - port: 4000      # <-- SERVICE PORT: The internal port for other services (e.g., frontend) to use
+      targetPort: 4000
+      nodePort: 30997
+       # <-- CONTAINER PORT: The port your Flask app runs on (must match your app config)
+      protocol: TCP
+  selector:
+    app: backend      # <-- CRUCIAL: Must match the label in your backend Deployment

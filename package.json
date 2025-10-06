@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "all": "^0.0.0",
     "chart.js": "^4.5.0",
+    "cors": "^2.8.5",
     "lucide-react": "^0.544.0"
   }
 }

@@ -1,0 +1,21 @@
+# .dockerignore
+# Backend files ignored
+
+__pycache__
+*.pyc
+venv
+.venv
+
+
+# Frontend files ignored
+
+nde_modules
+build
+dist
+
+# Git and OS files
+
+.git
+.gitignore
+.DS_Store
+*.log

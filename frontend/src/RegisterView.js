@@ -3,6 +3,7 @@ import axios from 'axios';
 
 // Configure Axios to send cookies with every request
 axios.defaults.withCredentials = true;
+const API_BASE_URL = "http://192.168.67.2:30997"; 
 
 const RegisterView = ({ setAuthMessage, setShowLogin }) => {
   const [registerFormUsername, setRegisterFormUsername] = useState('');
@@ -11,7 +12,7 @@ const RegisterView = ({ setAuthMessage, setShowLogin }) => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/register', {
+      const response = await axios.post(`${API_BASE_URL}/api/register`, {
         username: registerFormUsername,
         password: registerFormPassword
       });
