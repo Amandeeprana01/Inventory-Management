@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { User, CheckCircle, XCircle } from 'lucide-react';
+import {CheckCircle, XCircle } from 'lucide-react';
 
 // Configure Axios to send cookies with every request
 axios.defaults.withCredentials = true;
