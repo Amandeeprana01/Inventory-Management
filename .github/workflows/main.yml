@@ -27,74 +27,55 @@ jobs:
           username: ${{ env.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
-      # ----------------------------------------------
       # Build + Push Backend Image
-      # ----------------------------------------------
       - name: 🏗️ Build and Push Backend Image
         run: |
           TAG=$(echo "${GITHUB_SHA}" | cut -c1-7)
           echo "Building backend image with tag: $TAG"
-          
           docker build -t $BACKEND_IMAGE:$TAG .
           docker tag $BACKEND_IMAGE:$TAG $BACKEND_IMAGE:latest
-          
           echo "Pushing backend image..."
           docker push $BACKEND_IMAGE:$TAG
           docker push $BACKEND_IMAGE:latest
 
-      # ----------------------------------------------
       # Build + Push Frontend Image
-      # ----------------------------------------------
       - name: 🏗️ Build and Push Frontend Image
         run: |
           TAG=$(echo "${GITHUB_SHA}" | cut -c1-7)
           echo "Building frontend image with tag: $TAG"
-          
           docker build -f ./frontend/Dockerfile -t $FRONTEND_IMAGE:$TAG ./frontend
           docker tag $FRONTEND_IMAGE:$TAG $FRONTEND_IMAGE:latest
-          
           echo "Pushing frontend image..."
           docker push $FRONTEND_IMAGE:$TAG
           docker push $FRONTEND_IMAGE:latest
 
-  # ----------------------------------------------
-  # Deployment to Minikube
-  # ----------------------------------------------
-    deploy-to-k3s:
-      name: 🚀 Deploy to K3s Cluster (EC2)
-      runs-on: ubuntu-latest
-      needs: build-and-push
-  
-      steps:
-        - name: ⬇️ Checkout repository
-          uses: actions/checkout@v3
-  
-        - name: 💾 Set up kubectl
-          uses: azure/setup-kubectl@v3
-          with:
-            version: 'v1.28.0'
-  
-        # -----------------------------
-        # Configure kubeconfig for K3s
-        # -----------------------------
-        - name: 🔐 Configure access to K3s cluster
-          run: |
-            mkdir -p $HOME/.kube
-            echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
-            chmod 600 $HOME/.kube/config
-            echo "✅ K3s kubeconfig set successfully."
-  
-        # -----------------------------
-        # Deploy Updated Images to K3s
-        # -----------------------------
-        - name: 🔄 Update Kubernetes Deployments on K3s
-          run: |
-            echo "⚙️ Updating deployments with new Docker images..."
-            kubectl set image deployment/frontend frontend=$FRONTEND_IMAGE:latest -n $KUBE_DEPLOYMENT_NAMESPACE
-            kubectl set image deployment/backend backend=$BACKEND_IMAGE:latest -n $KUBE_DEPLOYMENT_NAMESPACE
-            
-            echo "⏳ Waiting for rollout to complete..."
-            kubectl rollout status deployment/frontend -n $KUBE_DEPLOYMENT_NAMESPACE
-            kubectl rollout status deployment/backend -n $KUBE_DEPLOYMENT_NAMESPACE
-          
-            echo "🚀 Deployment completed successfully on K3s cluster!"
+  deploy-to-k3s:
+    name: 🚀 Deploy to K3s Cluster (EC2)
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 💾 Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: 🔐 Configure access to K3s cluster
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          echo "✅ K3s kubeconfig set successfully."
+
+      - name: 🔄 Update Kubernetes Deployments on K3s
+        run: |
+          echo "⚙️ Updating deployments with new Docker images..."
+          kubectl set image deployment/frontend frontend=$FRONTEND_IMAGE:latest -n $KUBE_DEPLOYMENT_NAMESPACE
+          kubectl set image deployment/backend backend=$BACKEND_IMAGE:latest -n $KUBE_DEPLOYMENT_NAMESPACE
+          echo "⏳ Waiting for rollout to complete..."
+          kubectl rollout status deployment/frontend -n $KUBE_DEPLOYMENT_NAMESPACE
+          kubectl rollout status deployment/backend -n $KUBE_DEPLOYMENT_NAMESPACE
+          echo "🚀 Deployment completed successfully on K3s cluster!"
