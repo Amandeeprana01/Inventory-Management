@@ -74,8 +74,8 @@ jobs:
         run: |
           TAG=$(echo "${GITHUB_SHA}" | cut -c1-7)
           echo "⚙️ Updating deployments with new Docker images..."
-          kubectl set image deployment/frontend frontend=$FRONTEND_IMAGE:latest -n $KUBE_DEPLOYMENT_NAMESPACE
-          kubectl set image deployment/backend backend=$BACKEND_IMAGE:latest -n $KUBE_DEPLOYMENT_NAMESPACE
+          kubectl set image deployment/frontend frontend=$FRONTEND_IMAGE:$TAG -n $KUBE_DEPLOYMENT_NAMESPACE
+          kubectl set image deployment/backend backend=$BACKEND_IMAGE:$TAG -n $KUBE_DEPLOYMENT_NAMESPACE
           echo "⏳ Waiting for rollout to complete..."
           kubectl rollout status deployment/frontend -n $KUBE_DEPLOYMENT_NAMESPACE
           kubectl rollout status deployment/backend -n $KUBE_DEPLOYMENT_NAMESPACE
