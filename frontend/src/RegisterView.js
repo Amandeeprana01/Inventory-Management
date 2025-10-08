@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Configure Axios to send cookies with every request
 axios.defaults.withCredentials = true;
-const API_BASE_URL = "http://192.168.67.2:30997"; 
+const API_BASE_URL = "http://192.168.49.2:30997"; 
 
 const RegisterView = ({ setAuthMessage, setShowLogin }) => {
   const [registerFormUsername, setRegisterFormUsername] = useState('');

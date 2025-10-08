@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend-deployment
+  name: frontend
   labels:
     app: frontend
 spec:
@@ -16,16 +16,29 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: amandeeprana/inventoryproject_frontend:v1
+        image: amandeeprana/inventoryproject_frontend:latest  # Use 'latest' for CI/CD updates
         imagePullPolicy: Always
         ports:
-        - containerPort: 80 
+        - containerPort: 80
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
-
           requests:
-            # *** ADD THIS SECTION AND LOWER THE CPU REQUEST ***
             memory: "128Mi"
-            cpu: "500m" # Requesting only half a CPU core (500m)
+            cpu: "500m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  selector:
+    app: frontend
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30001
+
