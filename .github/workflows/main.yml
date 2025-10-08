@@ -72,6 +72,7 @@ jobs:
 
       - name: 🔄 Update Kubernetes Deployments on K3s
         run: |
+          TAG=$(echo "${GITHUB_SHA}" | cut -c1-7)
           echo "⚙️ Updating deployments with new Docker images..."
           kubectl set image deployment/frontend frontend=$FRONTEND_IMAGE:latest -n $KUBE_DEPLOYMENT_NAMESPACE
           kubectl set image deployment/backend backend=$BACKEND_IMAGE:latest -n $KUBE_DEPLOYMENT_NAMESPACE
