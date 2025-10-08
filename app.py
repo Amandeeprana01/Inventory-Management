@@ -344,3 +344,7 @@ def create_allocation():
         db.session.rollback()
         print(f"Error creating allocation: {e}")
         return jsonify({"error": "Failed to create allocation"}), 500
+
+if __name__ == "__main__":
+    # 0.0.0.0 allows external connections from your NodePort
+    app.run(host="0.0.0.0", port=4000)  # use your container port
