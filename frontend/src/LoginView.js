@@ -3,7 +3,9 @@ import axios from 'axios';
 
 // Configure Axios to send cookies with every request
 axios.defaults.withCredentials = true;
-const API_BASE_URL = "http://3.93.195.216:30997";
+// NOTE: I kept the API_BASE_URL as provided, but remember from earlier steps 
+// that 30997 was one of the redundant ports. Ensure your backend is still on 30997 or use 30002.
+const API_BASE_URL = "http://3.93.195.216:30997"; 
 
 const LoginView = ({ setIsLoggedIn, setUsername, setIsAdmin, setAuthMessage, setShowLogin, fetchInventory, fetchSummary, fetchUserInventory }) => {
   const [loginFormUsername, setLoginFormUsername] = useState('');
@@ -15,11 +17,16 @@ const LoginView = ({ setIsLoggedIn, setUsername, setIsAdmin, setAuthMessage, set
       const response = await axios.post(`${API_BASE_URL}/api/login`, {
         username: loginFormUsername,
         password: loginFormPassword
+      }, {
+       
+        timeout: 30000 
       });
+
       setIsLoggedIn(true);
       setUsername(response.data.username);
       setIsAdmin(response.data.is_admin);
       setAuthMessage('');
+
       if (response.data.is_admin) {
         fetchInventory();
         fetchSummary();
@@ -27,7 +34,14 @@ const LoginView = ({ setIsLoggedIn, setUsername, setIsAdmin, setAuthMessage, set
         fetchUserInventory();
       }
     } catch (error) {
-      setAuthMessage(error.response?.data?.error || "Login failed.");
+      // Check for the specific timeout error message from Axios
+      if (axios.isCancel(error)) {
+        setAuthMessage("Login request timed out. The server took too long to respond.");
+      } else if (error.code === 'ECONNABORTED') {
+        setAuthMessage("Connection aborted. The request was too slow.");
+      } else {
+        setAuthMessage(error.response?.data?.error || "Login failed.");
+      }
       console.error("Login failed:", error);
     }
   };
