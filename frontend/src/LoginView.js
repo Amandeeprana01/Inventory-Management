@@ -5,7 +5,7 @@ import axios from 'axios';
 axios.defaults.withCredentials = true;
 // NOTE: I kept the API_BASE_URL as provided, but remember from earlier steps 
 // that 30997 was one of the redundant ports. Ensure your backend is still on 30997 or use 30002.
-const API_BASE_URL = "http://3.93.195.216:30997"; 
+const API_BASE_URL = "http://3.93.195.216:30002"; 
 
 const LoginView = ({ setIsLoggedIn, setUsername, setIsAdmin, setAuthMessage, setShowLogin, fetchInventory, fetchSummary, fetchUserInventory }) => {
   const [loginFormUsername, setLoginFormUsername] = useState('');

@@ -11,7 +11,7 @@ import AssignView from './AssignView';
 Chart.register(...registerables);
 axios.defaults.withCredentials = true;
 // NOTE: Use a relative path or read this from environment variables in a real app
-const API_BASE_URL = "http://3.93.195.216:30997";
+const API_BASE_URL = "http://3.93.195.216:30002";
 
 const App = () => {
     // Authentication & User State
