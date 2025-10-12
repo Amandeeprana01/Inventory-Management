@@ -5,7 +5,7 @@ import {CheckCircle, XCircle } from 'lucide-react';
 // Configure Axios to send cookies with every request
 axios.defaults.withCredentials = true;
 // NOTE: Define API_BASE_URL here for consistency
-const API_BASE_URL = 'http://54.227.32.199:30997';
+const API_BASE_URL = 'http://3.93.195.216:30997';
 
 const AssignView = ({ item, setCurrentPage, fetchInventory, fetchSummary, setAssigningItem }) => {
     const [users, setUsers] = useState([]);

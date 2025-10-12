@@ -34,10 +34,10 @@ const AddEditForm = ({ editingItem, setEditingItem, setCurrentPage, fetchInvento
 
       if (editingItem) {
         // Handle update
-        await axios.put(`http://54.227.32.199:30997/api/inventory/${editingItem.id}`, itemData);
+        await axios.put(`http://3.93.195.216/api/inventory/${editingItem.id}`, itemData);
       } else {
         // Handle add
-        await axios.post('http://54.227.32.199:30997/api/inventory', itemData);
+        await axios.post('http://3.93.195.216/api/inventory', itemData);
       }
 
       // Clear the form and fetch new data
